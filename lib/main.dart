@@ -54,7 +54,6 @@ class _MainPageState extends State<MainPage> {
           };
           precacheImage(NetworkImage(newCard['url']), context);
           nextCards.add(newCard);
-          print(responseData);
         });
       }
     }
@@ -91,10 +90,6 @@ class _MainPageState extends State<MainPage> {
       nextCards.length < 2
           ? Expanded(child: Center(child: CircularProgressIndicator()))
           : Expanded(
-              // width: double.infinity,
-              // height: double.infinity,
-              // width: 800,
-              // height: 600,
               child: CardSwiper(
               padding: EdgeInsets.zero,
               cardsCount: nextCards.length,
@@ -144,8 +139,6 @@ class _MainPageState extends State<MainPage> {
                             end: Alignment.bottomCenter,
                             colors: <Color>[
                               Colors.brown.withAlpha(0),
-                              // Colors.black12,
-                              // Colors.black45
                               Colors.brown,
                             ],
                           ),
@@ -242,7 +235,6 @@ class SwipeButtons extends StatelessWidget {
                         swiperController.swipe(CardSwiperDirection.left);
                       },
                       icon: Icon(Icons.heart_broken, color: Colors.black))),
-              // label: Text("I'm a horrible person"))),
               Ink(
                   decoration: const ShapeDecoration(
                       color: Colors.white, shape: CircleBorder()),
@@ -251,7 +243,6 @@ class SwipeButtons extends StatelessWidget {
                       swiperController.swipe(CardSwiperDirection.right);
                     },
                     icon: Icon(Icons.favorite, color: Colors.red),
-                    // label: Text('Like'),
                   )),
             ],
           ),
