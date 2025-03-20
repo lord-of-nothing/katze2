@@ -4,6 +4,7 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const App());
@@ -25,7 +26,6 @@ class App extends StatelessWidget {
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
-
   @override
   State<MainPage> createState() => _MainPageState();
 }
@@ -37,6 +37,7 @@ class _MainPageState extends State<MainPage> {
   final maxImagesInQueue = 5;
   final _swiperController = CardSwiperController();
   List nextCards = [];
+  int _likes = 0;
 
   fetchImage() async {
     var url = Uri.https(
@@ -62,9 +63,25 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    _loadCounter();
     for (var i = 0; i < maxImagesInQueue; ++i) {
       fetchImage();
     }
+  }
+
+  Future<void> _loadCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _likes = prefs.getInt('likes') ?? 0;
+    });
+  }
+
+  Future<void> _incrementCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _likes = (prefs.getInt('likes') ?? 0) + 1;
+      prefs.setInt('likes', _likes);
+    });
   }
 
   @override
@@ -101,26 +118,18 @@ class _MainPageState extends State<MainPage> {
                             imageUrl: nextCards[index]['url'],
                             fit: BoxFit.cover,
                             alignment: Alignment.center)),
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: counterHeight,
-                      child: Container(
-                        padding: const EdgeInsets.all(5.0),
-                        alignment: Alignment.bottomCenter,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: <Color>[
-                              Colors.brown.withAlpha(128),
-                              Colors.brown.withAlpha(0),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                    Align(
+                        alignment: Alignment.topCenter,
+                        child: Text("You liked $_likes cats",
+                            style: GoogleFonts.rowdies(
+                                color: Color.fromARGB(255, 244, 232, 193),
+                                fontSize: 20.0,
+                                shadows: [
+                                  Shadow(
+                                    blurRadius: 5.0,
+                                    color: Colors.black,
+                                  )
+                                ]))),
                     Positioned(
                       bottom: 0,
                       left: 0,
@@ -167,11 +176,11 @@ class _MainPageState extends State<MainPage> {
 
   bool _onSwipe(
       int previousIndex, int? currentIndex, CardSwiperDirection direction) {
-    if (nextCards.length <= 1) {
-      return false;
-    }
     setState(() {
       nextCards.remove(0);
+      if (direction == CardSwiperDirection.right) {
+        _incrementCounter();
+      }
     });
     fetchImage();
     return true;
