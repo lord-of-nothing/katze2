@@ -16,6 +16,8 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Katze',
+      theme: ThemeData(
+          scaffoldBackgroundColor: Color.fromARGB(255, 244, 232, 193)),
       home: const MainPage(),
     );
   }
@@ -70,13 +72,14 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
         body: Column(children: <Widget>[
       nextCards.length < 2
-          ? CircularProgressIndicator()
+          ? Expanded(child: Center(child: CircularProgressIndicator()))
           : Expanded(
               // width: double.infinity,
               // height: double.infinity,
               // width: 800,
               // height: 600,
               child: CardSwiper(
+              padding: EdgeInsets.zero,
               cardsCount: nextCards.length,
               controller: _swiperController,
               cardBuilder:
@@ -89,6 +92,7 @@ class _MainPageState extends State<MainPage> {
                               DetailPage(data: nextCards[index])));
                 }, child: LayoutBuilder(builder: (context, constraints) {
                   double labelHeight = constraints.maxHeight * 0.3;
+                  double counterHeight = constraints.maxHeight * 0.1;
 
                   return Card(
                       child: Stack(alignment: Alignment.center, children: [
@@ -97,6 +101,26 @@ class _MainPageState extends State<MainPage> {
                             imageUrl: nextCards[index]['url'],
                             fit: BoxFit.cover,
                             alignment: Alignment.center)),
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: counterHeight,
+                      child: Container(
+                        padding: const EdgeInsets.all(5.0),
+                        alignment: Alignment.bottomCenter,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: <Color>[
+                              Colors.brown.withAlpha(128),
+                              Colors.brown.withAlpha(0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                     Positioned(
                       bottom: 0,
                       left: 0,
@@ -117,18 +141,14 @@ class _MainPageState extends State<MainPage> {
                             ],
                           ),
                         ),
-                        // child: Text(
-                        // nextCards[index]['breeds'][0]['name'],
-                        // style: TextStyle(
-                        // color: Colors.black, fontSize: 20.0),
-                        // ),
                       ),
                     ),
                     Positioned(
                         bottom: 15,
                         child: Text(nextCards[index]['breeds'][0]['name'],
                             style: GoogleFonts.rowdies(
-                                color: Colors.white, fontSize: 30.0))),
+                                color: Color.fromARGB(255, 244, 232, 193),
+                                fontSize: 30.0))),
                     Positioned(
                         bottom: 15,
                         left: 15,
@@ -166,12 +186,27 @@ class DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(),
-        body: Center(
+        body: Padding(
+          padding: EdgeInsets.all(15.0),
           child: SingleChildScrollView(
-              child: Column(children: [
-            CachedNetworkImage(imageUrl: data["url"]),
-            Text(data["breeds"][0]["description"]),
-          ])),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                CachedNetworkImage(imageUrl: data["url"], fit: BoxFit.cover),
+                Text(data["breeds"][0]["name"],
+                    style: GoogleFonts.rowdies(
+                        color: Colors.brown,
+                        fontSize: 40.0,
+                        fontWeight: FontWeight.bold)),
+                Divider(color: Colors.brown.withAlpha(128)),
+                Text(
+                  data["breeds"][0]["description"],
+                  style:
+                      GoogleFonts.rowdies(color: Colors.brown, fontSize: 25.0),
+                  textAlign: TextAlign.justify,
+                ),
+              ])),
         ));
   }
 }
